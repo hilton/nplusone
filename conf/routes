@@ -1,0 +1,10 @@
+GET /   controllers.Application.dashboard
+
+GET /assets/*file   controllers.Assets.at(path="/public", file)
+
+GET /login    securesocial.controllers.LoginPage.login
+GET /logout   securesocial.controllers.LoginPage.logout
+
+GET      /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
+POST     /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
+GET      /not-authorized             securesocial.controllers.ProviderController.notAuthorized

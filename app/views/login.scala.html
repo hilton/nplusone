@@ -1,0 +1,35 @@
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, flash: Flash)
+
+@import helper._
+@import securesocial.core.Registry
+@import securesocial.core.AuthenticationMethod._
+@import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
+
+@main("Welcome", None) {
+	<div class="container">
+		<div class="jumbotron">
+			@errorMsg.map { msg =>
+				<div class="alert alert-error">
+					@Messages(msg)
+				</div>
+			}
+			<h1>Welcome to N+1</h1>
+			<p>Growing the study population, one subject at a time</p>
+	    @defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
+
+	        @if( externalProviders.size > 0 ) {
+	            <div class="clearfix">
+	                <p>
+	                @for(provider <- externalProviders) {
+		                <a class="btn btn-primary btn-lg" role="button" href="@provider.authenticationUrl">
+			                Sign in with @Messages(provider.id)
+		                </a>
+	                }
+	                </p>
+	            </div>
+	        }
+	    }
+		</div>
+	</div>
+
+}
