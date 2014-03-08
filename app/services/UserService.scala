@@ -5,7 +5,9 @@ import play.api.Application
 import securesocial.core.{SocialUser, Identity, IdentityId, UserServicePlugin}
 import securesocial.core.providers.Token
 
-
+/**
+ * Secure Social integration.
+ */
 class UserService(application: Application) extends UserServicePlugin(application) {
 
   /**

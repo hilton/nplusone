@@ -8,17 +8,24 @@ import models.db.Users
 import securesocial.core.IdentityId
 import securesocial.core.PasswordInfo
 
-case class User(id: Option[Int], identityId: IdentityId, oAuth2Info: Option[OAuth2Info], fullName: String) extends Identity {
+/**
+ * A user account, for authentication with Secure Social.
+ */
+case class User(id: Option[Int], identityId: IdentityId, fullName: String) extends Identity {
 
-  def email: Option[String] = None
+  def email = Option.empty[String]
   def firstName = ""
   def lastName = ""
-  def avatarUrl: Option[String] = None
-  def authMethod: AuthenticationMethod = AuthenticationMethod.OAuth2
-  def oAuth1Info: Option[OAuth1Info] = None
-  def passwordInfo: Option[PasswordInfo] = None
+  def avatarUrl = Option.empty[String]
+  def authMethod = AuthenticationMethod.OAuth2
+  def oAuth1Info = Option.empty[OAuth1Info]
+  def oAuth2Info = Option.empty[OAuth2Info]
+  def passwordInfo = Option.empty[PasswordInfo]
 }
 
+/**
+ * Data access object.
+ */
 object User {
 
   val users = TableQuery[Users]
@@ -28,7 +35,7 @@ object User {
   }
 
   def forSocialUser(user: SocialUser): User = {
-    User(None, user.identityId, user.oAuth2Info, user.fullName)
+    User(None, user.identityId, user.fullName)
   }
 
   def save(user: User): User = DB.withSession { implicit session: Session ⇒
