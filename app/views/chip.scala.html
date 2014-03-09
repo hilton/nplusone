@@ -1,0 +1,206 @@
+@(user: securesocial.core.Identity)(implicit request: RequestHeader)
+
+@main("CHIP Prediction Rule", Some(user)) {
+
+	<h1>CHIP Prediction Rule <img class="pull-right" src="@routes.Assets.at("chip.png")"></h1>
+
+	<p>Calculate the score for the CHIP prediction rule and predicted probability of intracranial traumatic findings on CT, as described in Smits et al,
+	<a href="http://www.annals.org/cgi/content/abstract/146/6/397">Ann Intern Med. 2007;146:397-405</a>:
+	<em>Predicting Intracranial Traumatic Findings on Computed Tomography in Patients with Minor Head Injury: The CHIP Prediction Rule</em>.</p>
+
+	<div id="definition_template" class="hidden alert alert-info alert-dismissable">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+		<strong>Definition.</strong> <span></span>
+	</div>
+
+	<form name="chip" action="" role="form">
+
+		<div class="row space-after">
+			<div class="col-md-12">
+				<input class="btn-default btn" type="reset" onclick="this.form.reset(); calculate()" value="Reset values">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<fieldset id="signs">
+				<div class="form-group">
+					<label for="">Signs and symptoms</label>
+
+					<div class="checkbox">
+						<label for="fracture">
+							<input onclick="calculate(this)" type="checkbox" name="fracture" id="fracture">
+							Signs of skull fracture
+							<span class="glyphicon glyphicon-question-sign" title="Signs of skull fracture - any injury suggesting a skull fracture, such as palpable discontinuity of the skull, leakage of cerebrospinal fluid, 'raccoon eye' bruising, and bleeding from the ear"></span>
+						</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="contusion">
+							<input onclick="calculate(this)" type="checkbox" name="contusion" id="contusion">
+							Contusion of the skull
+							<span class="glyphicon glyphicon-question-sign" title="Contusion of the skull - clinically significant discontinuity of the skin or extensive bruising"></span>
+						</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="vomit">
+							<input onclick="calculate(this)" type="checkbox" name="vomit" id="vomit"> Vomiting
+						</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="loc">
+							<input onclick="calculate(this)" type="checkbox" name="loc" id="loc"> Loss of consciousness
+							<span class="glyphicon glyphicon-question-sign" title="Loss of consciousness - either witnessed or reported by the patient"></span>
+						</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="seizure">
+							<input onclick="calculate(this)" type="checkbox" name="seizure" id="seizure"> Posttraumatic seizure
+						</label>
+					</div>
+				</div>
+				</fieldset>
+
+				<fieldset>
+					<div class="form-group">
+						<label for="age">Patient age</label>
+						<br><input id="age" onkeyup="calculate(this)" type="text" name="age" class="number">
+						<span class="help-inline">years (16 or above)</span>
+					</div>
+
+					<div class="checkbox">
+						<label for="act">
+							<input id="act" onclick="calculate(this)" type="checkbox" name="act">
+							Use of anticoagulant therapy
+							<span class="glyphicon glyphicon-question-sign" title="Use of anticoagulant therapy - coumarin derivatives or noniatrogenic coagulopathy"></span>
+						</label>
+					</div>
+				</fieldset>
+
+				<fieldset>
+				<div class="form-group">
+					<label for="">Mechanism of injury</label>
+
+					<div class="radio">
+						<label for="fall">
+							<input id="fall" onclick="calculate(this)" type="radio" name="mechanism" value="fall">
+							Fall from any elevation
+						</label>
+					</div>
+
+					<div class="radio">
+						<label for="cyclist">
+							<input id="cyclist" onclick="calculate(this)" type="radio" name="mechanism" value="cyclist">
+							Pedestrian/cyclist versus vehicle
+						</label>
+					</div>
+
+					<div class="radio">
+						<label for="ejected">
+							<input id="ejected" onclick="calculate(this)" type="radio" name="mechanism" value="ejected">
+							Ejected from vehicle
+						</label>
+					</div>
+				</div>
+				</fieldset>
+				<label for="prior">
+					Prior probability <span class="glyphicon glyphicon-question-sign" title="Prior probability - Prior probability of an intracranial traumatic finding on CT in the patient population"></span>
+					<br>
+					<select id="prior" name="prior" onchange="calculate(this);">
+						<option value="2.5">2.5%</option>
+						<option value="5">5.0%</option>
+						<option value="7.5" selected>7.5% (default)</option>
+						<option value="10">10.0%</option>
+						<option value="12.5">12.5%</option>
+						<option value="15">15.0%</option>
+					</select>
+				</label>
+
+			</div>
+
+			<div class="col-md-6 space-after">
+
+				<fieldset>
+					<div class="form-group">
+						<label class="control-label" for="">GCS score upon presentation <span class="glyphicon glyphicon-question-sign" title="GCS - Glasgow Coma Scale"></span></label>
+						<br>
+						<label for="gcs015" class="radio-inline">
+							<input id="gcs015" onclick="calculate(this)" type="radio" name="gcs0" value="15"> 15
+						</label>
+						<label for="gcs014" class="radio-inline">
+							<input id="gcs014" onclick="calculate(this)" type="radio" name="gcs0" value="14"> 14
+						</label>
+						<label for="gcs013" class="radio-inline">
+							<input id="gcs013" onclick="calculate(this)" type="radio" name="gcs0" value="13"> 13
+						</label>
+					</div>
+
+					<div class="form-group">
+						<label for="gcs1">GCS score after one hour <span class="glyphicon glyphicon-question-sign" title="GCS - Glasgow Coma Scale (range 3-15)"></span></label>
+						<br><input onkeyup="calculate(this)" type="text" name="gcs1" id="gcs1" class="number">
+						<span class="help-inline">(3-15)</span>
+					</div>
+
+					<div class="form-group">
+						<label for="">Post-traumatic amnesia</label>
+						<br>
+						<label class="radio-inline" for="ptanone"><input id="ptanone" onclick="calculate(this)" type="radio" name="pta" value="0"> none</label>
+						<label class="radio-inline" for="pta0"><input id="pta0" onclick="calculate(this)" type="radio" name="pta" value="0"> up to 2 hours</label>
+						<label class="radio-inline" for="pta2"><input id="pta2" onclick="calculate(this)" type="radio" name="pta" value="2"> 2-4 hours</label>
+						<label class="radio-inline" for="pta4"><input id="pta4" onclick="calculate(this)" type="radio" name="pta" value="4"> more than 4 hours</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="memory">
+							<input onclick="calculate(this)" type="checkbox" name="memory" id="memory">
+							Persistent anterograde amnesia
+							<span class="glyphicon glyphicon-question-sign" title="Persistent anterograde amnesia - short-term memory deficit"></span>
+						</label>
+					</div>
+
+					<div class="checkbox">
+						<label for="deficit">
+							<input onclick="calculate(this)" type="checkbox" name="deficit" id="deficit">
+							Neurologic deficit
+							<span class="glyphicon glyphicon-question-sign" title="Neurologic deficit - any abnormality on routine clinical neurologic examination"></span>
+						</label>
+					</div>
+				</fieldset>
+			</div>
+
+			<div class="row results">
+				<div class="col-xs-6 col-sm-3 text-center">
+					<span class="bg-info result" id="probabilityValue">0%</span>
+					<h4>Predicted probability</h4>
+				</div>
+				<div class="col-xs-6 col-sm-3 text-center">
+					<span class="bg-info result" id="scoreValue">0.0</span>
+					<h4>Total score</h4>
+				</div>
+			</div>
+		</div>
+
+	</form>
+
+	<div class="panel panel-default legal">
+		<div class="panel-heading">
+			<h3 class="panel-title">Legal statement</h3>
+		</div>
+		<div class="panel-body">
+			<p>The CHIP prediction rule may be used as an aid to decide whether to perfom a CT in minor head injury patients. However, the prediction rule can only complement, never replace, clinical judgment and can therefore be used only as a decision-support system. If clinical suspicion is high, a CT scan is indicated regardless of the prediction rule.</p>
+			<h4>No Medical Advice Given</h3>
+			<p>This site is not an attempt to practice medicine or provide specific medical advice, nor does the use of the site establish a doctor-patient relationship. For medical treatment or answers to personal questions, we strongly encourage you to consult with a qualified health care provider. For advice about your own care, please ask your doctor.</p>
+			<h4>Restrictions on Use</h3>
+			<p>You assume full responsibility for using the information on this site, and you understand and agree that this site is not responsible or liable for any claim, loss, or damage resulting from its use. While we try to keep the information on the site as accurate as possible, we disclaim any warranty concerning its accuracy, timeliness, and completeness, and any other warranty, express or implied, including warranties of merchantability or fitness for a particular purpose. We do not warrant that access to the site will be error- or virus-free.</p>
+		</div>
+	</div>
+
+	<p><small>CHIP logo, web page design and CHIP Prediction Rule calculator implementation &copy;Copyright 2007 <a href="http://hilton.org.uk/">Peter Hilton</a>.
+		This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/1.0/">Creative Commons License</a>;
+		any reproduction or derivative work must link to http://www.marionsmits.net/chip-prediction-rule/.</small></p>
+
+	<script src="@routes.Assets.at("chip.js")"></script>
+}

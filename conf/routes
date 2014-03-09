@@ -1,5 +1,7 @@
 GET /   controllers.Application.dashboard
 
+GET /chip   controllers.Application.chip
+
 GET /assets/*file   controllers.Assets.at(path="/public", file)
 
 GET /login    securesocial.controllers.LoginPage.login

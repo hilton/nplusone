@@ -12,4 +12,8 @@ object Application extends Controller with SecureSocial {
     Ok(views.html.dashboard(request.user))
   }
 
+  def chip = SecuredAction { implicit request ⇒
+    Ok(views.html.chip(request.user))
+  }
+
 }
