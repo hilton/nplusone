@@ -2,24 +2,29 @@ body {
 	padding: 20px 0;
 }
 
+.radio-inline {
+	padding-top: 0 !important;
+}
+
+.glyphicon-question-sign {
+	color: #1f5299;
+	margin-left: 10px;
+}
+
+.help-inline {
+	margin-left: 0.5em;
+	color: #737373
+}
+
 .space-after {
 	margin-bottom: 20px;
 }
 
-body.chip .result {
-	font-size:3.5em;
-	width:2.7em;
-	height:2.7em;
-	display:inline-block;
-	text-align:center;
-	padding-top:0.5em;
-	border-radius: 50%;
+body.chip .patient {
+	width: 16em;
 }
 
-body.chip .results {
-	margin:2em 0;
+body.chip .number {
+	width: 4em;
 }
 
-body.chip .legal {
-	margin-top:4em;
-}
