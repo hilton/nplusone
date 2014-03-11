@@ -2,8 +2,8 @@ body {
 	padding: 20px 0;
 }
 
-.radio-inline {
-	padding-top: 0 !important;
+.logo b {
+	color: #c00;
 }
 
 .glyphicon-question-sign {
@@ -11,13 +11,35 @@ body {
 	margin-left: 10px;
 }
 
+.form-control {
+	display: inline;
+}
+
+.radio-inline {
+	padding-top: 0 !important;
+}
+
 .help-inline {
 	margin-left: 0.5em;
 	color: #737373
 }
 
+.has-error .help-inline {
+	color:#a94442;
+}
+
 .space-after {
 	margin-bottom: 20px;
+}
+
+body.chip > .container {
+	background-image: url("/assets/chip.png");
+	background-repeat: no-repeat;
+	background-position: right 50px;
+}
+
+body.chip .alert {
+	margin-right:320px;
 }
 
 body.chip .patient {

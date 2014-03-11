@@ -1,5 +1,7 @@
 $(document).ready( function() {
 
+	$('#patient').focus();
+
 	$('span.glyphicon-question-sign').click(function() {
 		$('#definition').remove();
 		var $template = $('#definition_template');

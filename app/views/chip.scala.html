@@ -1,65 +1,80 @@
-@(user: securesocial.core.Identity)(implicit request: RequestHeader)
+@(user: securesocial.core.Identity, form: Form[ChipCase])(implicit request: RequestHeader, flash: Flash)
+
+@fieldErrors(fields: Field*) = {
+	@if(fields.exists(_.hasErrors)) {
+		@fields.map(_.errors.map(error => Messages(error.message, error.args: _*))).flatten.toSet.mkString(", ")
+	}
+}
 
 @main("The CHIP Study", Some(user)) {
 
-	<h1 class="space-after"><img alt="The CHIP Study" src="@routes.Assets.at("chip.png")"></h1>
+	@if(form.hasErrors) {
+		<div class="alert alert-danger">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			Please fix the validation errors.
+		</div>
+	}
 
 	<div id="definition_template" class="hidden alert alert-info alert-dismissable">
 		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 		<strong>Definition.</strong> <span></span>
 	</div>
 
-	<form name="chip" action="" class="form-horizontal" role="form">
+	<form name="chip" action="@routes.Application.save" method="post" class="form-horizontal" role="form">
 
 		<fieldset>
-			<div class="form-group">
-				<div class="col-md-3">
-					<label for="">Patient number</label>
+			@defining(form("patient").hasErrors) { hasErrors =>
+				<div class="form-group @if(hasErrors) {has-error}">
+					<label class="col-md-3 control-label" for="patient">Patient number</label>
+					<div class="col-md-6">
+						<input id="patient" type="text" name="patient" class="patient form-control" value="@form("patient").value">
+						<span class="help-inline">
+							@if(hasErrors) {
+								@fieldErrors(form("patient"))
+							} else {
+								Required
+							}
+						</span>
+					</div>
 				</div>
-				<div class="col-md-6">
-					<input type="text" name="patient" class="patient">
-				</div>
-			</div>
+			}
 		</fieldset>
 
 		<fieldset>
 			<div class="form-group">
-				<div class="col-md-3">
-					<label for="">Signs and symptoms</label>
-				</div>
+				<label class="control-label col-md-3" for="">Signs and symptoms</label>
 				<div class="col-md-6">
 					<div class="checkbox">
 						<label class="" for="fracture">
-							<input type="checkbox" name="fracture" id="fracture">
+							<input type="checkbox" name="fracture" id="fracture" @if(form("fracture").value) {checked} value="true">
 							Signs of skull fracture
 							<span class="glyphicon glyphicon-question-sign" title="Signs of skull fracture - any injury suggesting a skull fracture, such as palpable discontinuity of the skull, leakage of cerebrospinal fluid, 'raccoon eye' bruising, and bleeding from the ear"></span>
 						</label>
 					</div>
 					<div class="checkbox">
-						<label>
-							<input type="checkbox"> Remember me
-						</label>
-					</div>
-					<div class="checkbox">
 						<label for="contusion">
-							<input type="checkbox" name="contusion" id="contusion"> Contusion of the skull
+							<input type="checkbox" name="contusion" id="contusion" @if(form("contusion").value) {checked} value="true">
+							Contusion of the skull
 							<span class="glyphicon glyphicon-question-sign" title="Contusion of the skull - clinically significant discontinuity of the skin or extensive bruising"></span>
 						</label>
 					</div>
 					<div class="checkbox">
 						<label for="vomit">
-							<input type="checkbox" name="vomit" id="vomit"> Vomiting
+							<input type="checkbox" name="vomit" id="vomit" @if(form("vomit").value) {checked} value="true">
+							Vomiting
 						</label>
 					</div>
 					<div class="checkbox">
 						<label for="loc">
-							<input type="checkbox" name="loc" id="loc"> Loss of consciousness
+							<input type="checkbox" name="loc" id="loc" @if(form("loc").value) {checked} value="true">
+							Loss of consciousness
 							<span class="glyphicon glyphicon-question-sign" title="Loss of consciousness - either witnessed or reported by the patient"></span>
 						</label>
 					</div>
 					<div class="checkbox">
 						<label for="seizure">
-							<input type="checkbox" name="seizure" id="seizure"> Post-traumatic seizure
+							<input type="checkbox" name="seizure" id="seizure" @if(form("seizure").value) {checked} value="true">
+							Post-traumatic seizure
 						</label>
 					</div>
 				</div>
@@ -67,19 +82,28 @@
 		</fieldset>
 
 		<fieldset>
-			<div class="form-group">
-				<label for="age" class="col-md-3">Patient age</label>
-				<div class="col-md-6">
-					<input id="age" type="number" name="age" class="number">
-					<span class="help-inline">years (16 or above)</span>
-				</div>
+			@defining(form("age").hasErrors) { hasErrors =>
+				<div class="form-group @if(hasErrors) {has-error}">
+					<label for="age" class="col-md-3 control-label">Patient age</label>
+					<div class="col-md-6">
+						<input id="age" type="number" name="age" class="number form-control" value="@form("age").value">
+						<span class="help-inline">
+							@if(hasErrors) {
+								@fieldErrors(form("age"))
+							} else {
+								Years (16 or above), required
+							}
+						</span>
+					</div>
+				}
 			</div>
 
 			<div class="form-group">
 				<div class="col-md-offset-3 col-md-6">
 					<div class="checkbox">
 						<label for="act">
-							<input id="act" type="checkbox" name="act"> Use of anticoagulant therapy
+							<input id="act" type="checkbox" name="act" @if(form("act").value) {checked} value="true">
+							Use of anticoagulant therapy
 							<span class="glyphicon glyphicon-question-sign" title="Use of anticoagulant therapy - coumarin derivatives or noniatrogenic coagulopathy"></span>
 						</label>
 					</div>
@@ -89,9 +113,7 @@
 
 		<fieldset>
 			<div class="form-group">
-				<div class="col-md-3">
-					<label for="">Mechanism of injury</label>
-				</div>
+				<label class="control-label col-md-3" for="fall">Mechanism of injury</label>
 				<div class="col-md-6">
 					<div class="radio">
 						<label for="fall">
@@ -119,11 +141,9 @@
 
 		<fieldset>
 			<div class="form-group">
-				<div class="col-md-3">
-					<label for="">
-						GCS score upon presentation
-					</label>
-				</div>
+				<label class="control-label col-md-3" for="gcs015">
+					GCS score upon presentation
+				</label>
 				<div class="col-md-6">
 					<label for="gcs015" class="radio-inline">
 						<input id="gcs015" type="radio" name="gcs0" value="15"> 15
@@ -138,23 +158,27 @@
 				</div>
 			</div>
 
-			<div class="form-group">
-				<div class="col-md-3">
-					<label for="gcs1">
-						GCS score after one hour 
+			@defining(form("gcs1").hasErrors) { hasErrors =>
+				<div class="form-group @if(hasErrors) {has-error}">
+					<label class="control-label col-md-3" for="gcs1">
+						GCS score after one hour
 					</label>
+					<div class="col-md-6">
+						<input type="number" name="gcs1" id="gcs1" class="number form-control" value="@form("gcs1").value">
+						<span class="help-inline">
+						@if(hasErrors) {
+							@fieldErrors(form("gcs1"))
+						} else {
+							(3-15)
+							<span class="glyphicon glyphicon-question-sign" title="GCS - Glasgow Coma Scale (range 3-15)"></span>
+						}
+						</span>
+					</div>
 				</div>
-				<div class="col-md-6">
-					<input type="number" name="gcs1" id="gcs1" class="number">
-					<span class="help-inline">(3-15)</span>
-					<span class="glyphicon glyphicon-question-sign" title="GCS - Glasgow Coma Scale (range 3-15)"></span>
-				</div>
-			</div>
+			}
 
 			<div class="form-group">
-				<div class="col-md-3">
-				<label for="">Post-traumatic amnesia</label>
-				</div>
+				<label class="control-label col-md-3" for="ptanone">Post-traumatic amnesia</label>
 				<div class="col-md-6">
 					<label class="radio-inline" for="ptanone">
 						<input id="ptanone" type="radio" name="pta" value="0"> none
@@ -175,7 +199,7 @@
 				<div class="col-md-offset-3 col-md-6">
 					<div class="checkbox">
 						<label for="memory">
-							<input type="checkbox" name="memory" id="memory">
+							<input type="checkbox" name="memory" id="memory" @if(form("memory").value) {checked} value="true">
 							Persistent anterograde amnesia
 							<span class="glyphicon glyphicon-question-sign" title="Persistent anterograde amnesia - short-term memory deficit"></span>
 						</label>
@@ -183,7 +207,7 @@
 
 					<div class="checkbox">
 						<label for="deficit">
-							<input type="checkbox" name="deficit" id="deficit">
+							<input type="checkbox" name="deficit" id="deficit" @if(form("deficit").value) {checked} value="true">
 							Neurologic deficit
 							<span class="glyphicon glyphicon-question-sign" title="Neurologic deficit - any abnormality on routine clinical neurologic examination"></span>
 						</label>
@@ -192,6 +216,11 @@
 			</div>
 		</fieldset>
 
+		<div class="form-group">
+			<div class="col-md-offset-3 col-md-6">
+				<button class="btn btn-primary">Save Case</button>
+			</div>
+		</div>
 	</form>
 
 	<script src="@routes.Assets.at("chip.js")"></script>

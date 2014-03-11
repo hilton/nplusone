@@ -1,6 +1,7 @@
 GET /   controllers.Application.dashboard
 
-GET /chip   controllers.Application.chip
+GET  /chip   controllers.Application.chip
+POST /chip   controllers.Application.save
 
 GET /assets/*file   controllers.Assets.at(path="/public", file)
 

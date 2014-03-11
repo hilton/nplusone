@@ -1,13 +1,12 @@
-@(title: String, maybeUser: Option[securesocial.core.Identity])(content: Html)(implicit request: RequestHeader)
+@(title: String, maybeUser: Option[securesocial.core.Identity])(content: Html)(implicit request: RequestHeader, flash: Flash)
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>@title - N+1</title>
+<title>@title - n+one</title>
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("main.css")">
@@ -21,7 +20,7 @@
 					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 						<span class="sr-only">Toggle navigation</span>
 					</button>
-					<a class="navbar-brand" href="/">N+1</a>
+					<a class="navbar-brand" href="/"><span class="logo">n<b>+</b>one</span></a>
 				</div>
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
@@ -39,7 +38,20 @@
 			</div>
 		</nav>
 	}
-@content
+
+	@alert(alertType: String) = {
+		@flash.get(alertType).map { message =>
+			<div class="alert alert-@alertType">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				@message
+			</div>
+		}
+	}
+
+	@alert("error")
+	@alert("success")
+
+	@content
 </div>
 </body>
 </html>

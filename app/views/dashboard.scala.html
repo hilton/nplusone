@@ -1,6 +1,15 @@
-@(user: securesocial.core.Identity)(implicit request: RequestHeader)
+@(user: securesocial.core.Identity, chipCount: Int)(implicit request: RequestHeader, flash: Flash)
 
 @main("Dashboard", Some(user)) {
 
-
+	<div class="col-md-6">
+		<table class="table table-bordered">
+			<tr>
+				<th>Study</th><th>Cases</th>
+			</tr>
+			<tr>
+				<td>CHIP</td><td>@chipCount</td>
+			</tr>
+		</table>
+	</div>
 }

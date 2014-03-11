@@ -13,8 +13,8 @@
 					@Messages(msg)
 				</div>
 			}
-			<h1>Welcome to N+1</h1>
-			<p>Growing the study population, one subject at a time</p>
+			<h1>Welcome to <span class="logo">n<b>+</b>one</span></h1>
+			<p>Growing the study population, one case at a time</p>
 	    @defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
 
 	        @if( externalProviders.size > 0 ) {
