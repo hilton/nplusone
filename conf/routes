@@ -1,7 +1,8 @@
 GET /   controllers.Application.dashboard
 
-GET  /chip   controllers.Application.chip
-POST /chip   controllers.Application.save
+GET  /chip       controllers.Application.chip
+GET  /chip.xls   controllers.Application.export
+POST /chip       controllers.Application.save
 
 GET /assets/*file   controllers.Assets.at(path="/public", file)
 

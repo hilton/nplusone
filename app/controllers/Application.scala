@@ -8,8 +8,14 @@ import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core.SecuredRequest
 import securesocial.core.SecureSocial
+import net.sf.jxls.transformer.XLSTransformer
+import java.io.{ByteArrayOutputStream, FileInputStream, File}
+import scala.collection.mutable
+import org.joda.time.format.DateTimeFormat
 
 object Application extends Controller with SecureSocial {
+
+  val exportTemplate = "app/views/chip.xls"
 
   def form(implicit request: SecuredRequest[_]) = Form(mapping(
     "id" -> ignored(Option.empty[Int]),
@@ -38,10 +44,36 @@ object Application extends Controller with SecureSocial {
     Ok(views.html.dashboard(request.user, ChipCase.count))
   }
 
+  /**
+   * Input form.
+   */
   def chip = SecuredAction { implicit request ⇒
     Ok(views.html.chip(request.user, form))
   }
 
+  /**
+   * Exports all cases as a spreadsheet.
+   */
+  def export = SecuredAction { implicit request ⇒
+    val template = new FileInputStream(new File(exportTemplate))
+    import scala.collection.JavaConverters._
+    val beans = mutable.HashMap("cases" -> ChipCase.find.asJava)
+    val workbook = new XLSTransformer().transformXLS(template, beans.asJava)
+    template.close()
+
+    val outputStream = new ByteArrayOutputStream()
+    workbook.write(outputStream)
+    outputStream.close()
+
+    val contentType = "application/vnd.ms-excel"
+    val timestamp = DateTimeFormat.forPattern("yyyy-MM-dd-HHmm").print(DateTime.now())
+    val headers = "Content-disposition" -> s"""inline;filename="chip-results-$timestamp.xls""""
+    Ok(outputStream.toByteArray).withHeaders(headers).as(contentType)
+  }
+
+  /**
+   * Handles form submission.
+   */
   def save = SecuredAction { implicit request ⇒
     val boundForm: Form[ChipCase] = form.bindFromRequest
     boundForm.fold(
