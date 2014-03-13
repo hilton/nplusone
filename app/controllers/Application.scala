@@ -9,13 +9,16 @@ import play.api.data.Forms._
 import securesocial.core.SecuredRequest
 import securesocial.core.SecureSocial
 import net.sf.jxls.transformer.XLSTransformer
-import java.io.{ByteArrayOutputStream, FileInputStream, File}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, File}
 import scala.collection.mutable
 import org.joda.time.format.DateTimeFormat
+import play.api.libs.ws.WS
+import scala.concurrent.Await
+import play.api.Play
 
 object Application extends Controller with SecureSocial {
 
-  val exportTemplate = "app/views/chip.xls"
+  val exportTemplate = "/assets/chip.xls"
 
   def form(implicit request: SecuredRequest[_]) = Form(mapping(
     "id" -> ignored(Option.empty[Int]),
@@ -55,16 +58,24 @@ object Application extends Controller with SecureSocial {
    * Exports all cases as a spreadsheet.
    */
   def export = SecuredAction { implicit request ⇒
-    val template = new FileInputStream(new File(exportTemplate))
+    // Load the XLS template from a URL so it works without file system access on Cloudbees.
+    import play.api.Play.current
+    import scala.concurrent.duration._
+    val url = Play.configuration.getString("application.url").getOrElse("http://localhost:9000") + exportTemplate
+    val templateBytes = Await.result(WS.url(url).get, 2.seconds).ahcResponse.getResponseBodyAsBytes
+    play.api.Logger.debug(s"template length ${templateBytes.length}")
+    val template = new ByteArrayInputStream(templateBytes)
+
+    // Generate a spreadsheet.
     import scala.collection.JavaConverters._
     val beans = mutable.HashMap("cases" -> ChipCase.find.asJava)
     val workbook = new XLSTransformer().transformXLS(template, beans.asJava)
     template.close()
-
     val outputStream = new ByteArrayOutputStream()
     workbook.write(outputStream)
     outputStream.close()
 
+    // Serve a binary response.
     val contentType = "application/vnd.ms-excel"
     val timestamp = DateTimeFormat.forPattern("yyyy-MM-dd-HHmm").print(DateTime.now())
     val headers = "Content-disposition" -> s"""inline;filename="chip-results-$timestamp.xls""""
